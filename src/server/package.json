@@ -1,0 +1,15 @@
+{
+  "name": "rblx-auth",
+  "version": "1.0.0",
+  "description": "Demonstration repo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
+    "express": "^4.21.2"
+  }
+}
