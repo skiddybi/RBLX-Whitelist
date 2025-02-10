@@ -12,6 +12,7 @@ const allowed_fingerprints = [
 ];
 
 app.post('/whitelist', async (req, res) => {
+  console.log(req.body, req.headers);
   const { whitelistkey } = req.body;
   const headers = req.headers;
   let foundFingerprint = null;
