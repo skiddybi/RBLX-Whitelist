@@ -54,26 +54,58 @@ local key = getgenv().whitelistKey or LPH_CRASH()
 local HttpService = game:GetService("HttpService")
 local request = (http and http.request) or request or LPH_CRASH()
 
+
+-- You should be creative with your RNG Sources
+-- I'll provide 2 only for demonstration purposes | I'll also include how attackers can reverse those aswell
+local rng1 = math.random(1, 100000)
+local rng2 = Random.new():NextInteger(1, 100000)
+
+
 local response = request({
     Url = "http://localhost:3000/whitelist",
     Method = "POST",
     Body = HttpService:JSONEncode({
-        whitelistkey = key
+        whitelistkey = key,
+        firstValue = rng1,
+        secondValue = rng2
     }),
     Headers = {
         ["Content-Type"] = "application/json"
     }
 })
 
+local JumpCounter = 0
+
 if response.StatusCode == 200 then
+    JumpCounter = JumpCounter + 1 -- 1
     local body = HttpService:JSONDecode(response.Body)
     if body.valid then
-        print("Whitelisted")
+        JumpCounter = JumpCounter + 1 -- 2
+        if (((body.newFirstValue + 32) / 2 ) == rng1) and ( ((body.newSecondValue - 256) / 5) == rng2) then
+            JumpCounter = JumpCounter + 1 -- 3
+
+            -- Jumpcounter will not be 3 if a sudden jump had happened
+            -- An attacker can easily get around this, it's just the most straightforward fix.
+            if JumpCounter ~= 3 then
+                LPH_CRASH()
+            end
+
+            -- Place this after the RNG check
+            LPH_ENCFUNC(
+                function()
+                    print("Whitelisted")
+                end,
+             "d5e03252767d767f6aab5730663c4563ae0e72625102cba812846c289ab46a74", body.decKey .. "ae0e72625102cba812846c289ab46a74" -- Concat our received key with a constant one here
+            )() -- Don't forget to call the function
+        else 
+            print("Incorrect data")
+            LPH_CRASH()
+        end
     else
         print("Not whitelisted")
         LPH_CRASH()
     end
 else
-    print("Server not responding")
+    print(`Server not responding with code {response.StatusCode}`)
     LPH_CRASH()
 end

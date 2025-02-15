@@ -1,3 +1,5 @@
+// This code is a SHIM, do NOT use in actual projects
+
 const express = require('express');
 const supabase = require('./supabase');
 const app = express();
@@ -12,7 +14,7 @@ const allowed_fingerprints = [
 ];
 
 app.post('/whitelist', async (req, res) => {
-  const { whitelistkey } = req.body;
+  const { whitelistkey, firstValue, secondValue } = req.body;
   const headers = req.headers;
   let foundFingerprint = null;
 
@@ -23,10 +25,14 @@ app.post('/whitelist', async (req, res) => {
     }
   }
 
-  // No fingerprint was found --> most likely an illegal request / unsupported executor
-  if (!foundFingerprint) {
-    return res.json({ message: "No fingerprint..." });
+  // Missing values --> most likely an illegal request / unsupported executor
+  if (!foundFingerprint || !whitelistkey || !firstValue || !secondValue) {
+    return res.json({ message: "???" });
   }
+
+  // fx 1 & fx 2
+  const newFirstValue = (firstValue * 2) - 32
+  const newSecondValue = (secondValue * 5) + 256
 
   const { data } = await supabase
     .from('whitelist')
@@ -37,7 +43,9 @@ app.post('/whitelist', async (req, res) => {
   if (data) {
     if (data.fingerprint === foundFingerprint) {
     // Case 1: The whitelist entry has the same fingerprint as the one we found
-      return res.json({ valid: true });
+      return res.json(
+        { valid: true, newFirstValue: newFirstValue ,newSecondValue: newSecondValue, decKey: "d5e03252767d767f6aab5730663c4563" }
+      );
     } else if (data.fingerprint === null) {
       // Case 2: The whitelist entry has no set fingerprint, so we set one
       const { error: updateError } = await supabase
@@ -49,7 +57,10 @@ app.post('/whitelist', async (req, res) => {
         return res.json({ valid: false });
       }
 
-      return res.json({ valid: true });
+      return res.json(
+        { valid: true, newFirstValue: newFirstValue ,newSecondValue: newSecondValue, decKey: "d5e03252767d767f6aab5730663c4563" }
+      );
+
     } else {
       // Case 3: The whitelist entry has a different fingerprint than the one we found
       return res.json({ valid: false });
