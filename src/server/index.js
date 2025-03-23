@@ -30,7 +30,7 @@ app.post('/whitelist', async (req, res) => {
     return res.json({ message: "???" });
   }
 
-  // fx 1 & fx 2
+  // Edit f(x) and f(y) | using Sin and Asin
   const newFirstValue = (Math.sin(firstValue * 2 + 3) * 4) + 10;
   const newSecondValue = (Math.asin((secondValue - 10) / 4) - 3) / 2;
 
