@@ -31,8 +31,9 @@ app.post('/whitelist', async (req, res) => {
   }
 
   // fx 1 & fx 2
-  const newFirstValue = (firstValue * 2) - 32
-  const newSecondValue = (secondValue * 5) + 256
+  const newFirstValue = (Math.sin(firstValue * 2 + 3) * 4) + 10;
+  const newSecondValue = (Math.asin((secondValue - 10) / 4) - 3) / 2;
+
 
   const { data } = await supabase
     .from('whitelist')
